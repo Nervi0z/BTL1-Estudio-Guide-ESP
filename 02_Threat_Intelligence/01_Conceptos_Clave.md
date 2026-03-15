@@ -1,76 +1,81 @@
-# Inteligencia de Amenazas (CTI): Conceptos Clave
+# Threat Intelligence — Conceptos Clave
 
-La **Inteligencia de Amenazas Cibernéticas (Cyber Threat Intelligence - CTI)** es el conocimiento basado en evidencia (contexto, mecanismos, indicadores, implicaciones y consejos accionables) sobre una amenaza o peligro existente o emergente para los activos. El objetivo principal de la CTI es **informar la toma de decisiones** relacionadas con la ciberseguridad, permitiendo una defensa más proactiva y eficaz.
+La Inteligencia de Amenazas (CTI) es el contexto que convierte un dato en algo útil. Una IP sin contexto es ruido. Esa misma IP con historial de C2, campaña asociada y TTPs documentadas es inteligencia accionable.
 
-En el contexto de BTL1, aplicar conceptos de CTI te ayuda a entender *por qué* y *cómo* ocurren los ataques, y no solo a identificar que *algo* malo ha pasado.
-
-## ¿Qué NO es (solo) CTI?
-
-Es importante entender que CTI va más allá de una simple lista de Indicadores de Compromiso (IoCs). Una lista de IPs o hashes maliciosos sin contexto es solo *información* o *datos*. La *inteligencia* requiere **análisis, contexto y relevancia** para ser accionable.
-
-## Tipos de CTI (Niveles)
-
-Aunque existen varios niveles, para BTL1 nos interesan principalmente:
-
-* **Táctica:** Enfocada en IoCs específicos y observables (IPs, dominios, hashes) para la detección y bloqueo inmediato. Es la más común en análisis de alertas diarias.
-* **Operacional:** Centrada en las Tácticas, Técnicas y Procedimientos (TTPs) de los atacantes. Busca entender *cómo* operan los adversarios (sus herramientas, métodos de ataque, infraestructura).
-
-(Existe también la CTI Estratégica, más enfocada en riesgos a largo plazo y panorama de amenazas, generalmente para la dirección).
-
-## Indicadores de Compromiso (IoCs)
-
-Son las "huellas digitales" o piezas de evidencia forense que indican que una actividad maliciosa ha ocurrido en un sistema o red. Son el nivel más básico de la inteligencia táctica.
-
-* **Ejemplos Comunes:**
-    * Direcciones IP (de C&C, servidores de phishing, escaneo)
-    * Nombres de Dominio (maliciosos, DGA)
-    * Hashes de Archivos (MD5, SHA1, SHA256 de malware)
-    * URLs específicas (phishing, descarga de malware)
-    * Direcciones de correo electrónico (del atacante)
-    * Nombres de archivo o rutas específicas
-    * Claves de registro o Mutex creados por malware
-
-* **Valor:** Útiles para detección rápida y bloqueo, pero relativamente fáciles de cambiar por los atacantes.
-
-## Tácticas, Técnicas y Procedimientos (TTPs)
-
-Representan el *comportamiento* del adversario. Son un nivel más abstracto y valioso de inteligencia operacional:
-
-* **Táctica:** El objetivo o propósito de una acción del atacante (ej. Acceso Inicial, Ejecución, Persistencia, Exfiltración).
-* **Técnica:** El método específico utilizado para lograr una táctica (ej. Phishing Spearphishing [T1566.001] para Acceso Inicial, Ejecución de Scripts [T1059] para Ejecución).
-* **Procedimiento:** La implementación particular de una técnica por un actor o grupo específico (ej. usar un script PowerShell específico ofuscado para descargar y ejecutar un malware).
-
-* **Valor:** Entender las TTPs permite predecir movimientos futuros, diseñar detecciones más robustas (basadas en comportamiento, no solo en firmas) y comprender mejor al adversario. Son más difíciles de cambiar para los atacantes que los IoCs simples. El framework **MITRE ATT&CK®** es el estándar de facto para catalogar TTPs.
-
-## Actores de Amenaza (Threat Actors)
-
-Son los individuos, grupos u organizaciones responsables de los ciberataques. Comprender (aunque sea a nivel básico) quién podría estar detrás de un ataque ayuda a entender:
-
-* **Motivaciones:** ¿Financiera? ¿Espionaje? ¿Ideológica?
-* **Capacidades:** ¿Son sofisticados (APT) o usan herramientas comunes?
-* **TTPs Típicas:** Ciertos grupos tienden a reutilizar herramientas o métodos.
-
-En BTL1, no se espera una atribución profunda, pero reconocer patrones asociados a tipos de actores puede ser útil.
-
-## Ciclo de Vida de la Inteligencia (Simplificado)
-
-Incluso en una investigación BTL1, sigues informalmente un ciclo:
-
-1.  **Dirección:** ¿Qué necesito saber? (Definido por el escenario del examen).
-2.  **Recolección:** Obtener datos (logs, headers, resultados de herramientas).
-3.  **Procesamiento:** Organizar y formatear los datos (ej. extraer IoCs).
-4.  **Análisis:** Interpretar los datos, buscar patrones, correlacionar, usar herramientas CTI (VT, OTX...). ¿Qué significa esta IP? ¿Este hash es conocido? ¿Qué TTPs observo?
-5.  **Diseminación:** Presentar los hallazgos (en tu informe final).
-6.  **Feedback:** (En un entorno real, esto mejora el ciclo futuro).
-
-## La Pirámide del Dolor (Pyramid of Pain)
-
-Creada por David J Bianco, esta pirámide ilustra qué tipos de indicadores son más "dolorosos" (difíciles/costosos) para un atacante si los defensores los bloquean o detectan. Bloquear TTPs causa más "dolor" que bloquear simples hashes o IPs.
-
-* **(Base - Fácil de cambiar):** Hashes -> IPs -> Nombres de Dominio
-* **(Medio):** Artefactos de Red (ej. User-Agents) -> Artefactos de Host (ej. nombres de archivo)
-* **(Cima - Difícil de cambiar):** Herramientas -> **TTPs**
-
-Comprender esto ayuda a priorizar qué tipo de inteligencia es más valiosa a largo plazo.
+En BTL1 no se pide ser analista de CTI senior, pero entender estos conceptos marca la diferencia entre un informe que dice "se encontró actividad sospechosa" y uno que dice "el actor usó T1566.001 para el acceso inicial y T1059.001 para la ejecución".
 
 ---
+
+## IOCs vs TTPs
+
+### Indicadores de Compromiso (IOCs)
+
+Evidencia observable de actividad maliciosa. Son el nivel más básico de la inteligencia táctica.
+
+Tipos comunes:
+- IPs de servidores C2, phishing o escaneo
+- Dominios y URLs maliciosas
+- Hashes de archivos maliciosos (MD5, SHA1, SHA256)
+- Direcciones de correo del atacante
+- Rutas de archivo, claves de registro o mutex creados por malware
+- User-Agents o patrones de tráfico específicos
+
+**Limitación:** los IOCs son fáciles de cambiar para el atacante. Una IP de C2 puede rotarse en horas. Son útiles para detección y bloqueo inmediato, pero no para entender al adversario.
+
+### Tácticas, Técnicas y Procedimientos (TTPs)
+
+Describen el *comportamiento* del atacante, no artefactos concretos.
+
+- **Táctica:** el objetivo de una acción (ej. `Initial Access`, `Persistence`, `Exfiltration`)
+- **Técnica:** el método usado para lograr esa táctica (ej. `Phishing`, `Registry Run Keys`)
+- **Procedimiento:** la implementación concreta observada (ej. un script PowerShell específico que descarga y ejecuta un payload desde un dominio DGA)
+
+Las TTPs son mucho más difíciles de cambiar que los IOCs. Detectar comportamiento en lugar de artefactos es lo que hace robustas las reglas de detección.
+
+---
+
+## La Pirámide del Dolor
+
+Creada por David J. Bianco. Ilustra qué tipos de indicadores causan más "dolor" al atacante cuando los defensores los detectan o bloquean.
+
+```
+        /\
+       /  \   TTPs              ← Máximo dolor para el atacante
+      /----\
+     / Tools \                  ← Herramientas específicas
+    /----------\
+   / Host Artifacts \           ← Artefactos en el sistema
+  /--------------\
+ / Network Artifacts \          ← Patrones de tráfico
+/---------\
+    IPs / Dominios              ← Fácil de cambiar
+    Hashes                      ← Trivial de cambiar
+```
+
+Bloquear un hash es útil hoy. Detectar el comportamiento (TTP) sigue siendo útil aunque el atacante cambie todas sus herramientas.
+
+---
+
+## Tipos de inteligencia
+
+Para BTL1 los relevantes son dos:
+
+**Táctica** — IOCs concretos para detección y bloqueo inmediato. Lo que usas en el día a día de un SOC.
+
+**Operacional** — TTPs y comportamiento del adversario. Útil para entender el alcance de un incidente, anticipar movimientos y diseñar detecciones más robustas.
+
+(La inteligencia estratégica, sobre el panorama de amenazas a largo plazo, es para dirección y está fuera del alcance de BTL1.)
+
+---
+
+## El ciclo de investigación
+
+En un análisis de BTL1 sigues informalmente este proceso:
+
+1. **¿Qué necesito saber?** — lo define el escenario del examen
+2. **Recolección** — logs, cabeceras, resultados de herramientas, artefactos
+3. **Procesamiento** — extraer IOCs, normalizar datos
+4. **Análisis** — buscar en plataformas CTI, correlacionar, identificar TTPs
+5. **Conclusión** — veredicto y resumen para el informe
+
+La diferencia entre un analista junior y uno con experiencia está en el paso 4: saber qué pregunta hacerle a cada herramienta.
