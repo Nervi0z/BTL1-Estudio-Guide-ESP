@@ -1,66 +1,87 @@
-# Análisis de Phishing: Conceptos Clave
+# Análisis de Phishing — Conceptos Clave
 
-El **phishing** es una de las técnicas de ingeniería social más utilizadas por los atacantes para obtener acceso inicial a una red, robar credenciales o distribuir malware. Como analista de seguridad, tu capacidad para identificar y analizar correos electrónicos, URLs y archivos adjuntos sospechosos es una habilidad de primera línea crucial.
+El phishing es el vector de acceso inicial más frecuente en incidentes reales. Tu trabajo como analista es determinar si un correo es malicioso y, si lo es, extraer los IOCs que permitan la detección, el bloqueo y el enriquecimiento de la investigación.
 
-El objetivo principal del análisis de phishing es determinar si un correo electrónico es malicioso y, en caso afirmativo, extraer **Indicadores de Compromiso (IoCs)** que puedan usarse para la detección, el bloqueo y la inteligencia de amenazas.
-
-## 🔎 Artefactos Principales a Examinar
-
-Al analizar un correo electrónico sospechoso, nos centraremos en varios artefactos clave:
-
-### 1. Encabezados del Correo (`Headers`)
-
-Los encabezados contienen metadatos vitales sobre el origen y la ruta del correo, a menudo ocultos en la vista estándar del cliente de correo. Son fundamentales para verificar la autenticidad. Elementos clave a revisar:
-
-* **`From:` (Remitente):** Quién dice enviar el correo. Puede ser fácilmente falsificado (`spoofed`).
-* **`Reply-To:` (Responder a):** Dirección a la que se enviarán las respuestas. A menudo diferente del `From:` en correos maliciosos.
-* **`Return-Path:` (Ruta de Retorno):** Dirección donde rebotan los correos no entregados. También puede indicar el origen real.
-* **`Received:` (Recibido):** Serie de entradas que muestran los servidores por los que pasó el correo. Se leen de abajo hacia arriba para trazar la ruta. Útil para identificar el servidor de origen real.
-* **`Authentication-Results:` (Resultados de Autenticación):** Muestra los resultados de las comprobaciones de **SPF, DKIM y DMARC**. Son cruciales:
-    * **SPF (Sender Policy Framework):** Verifica si la IP del servidor de envío está autorizada por el dominio del remitente. Un `FAIL` es una señal de alerta.
-    * **DKIM (DomainKeys Identified Mail):** Añade una firma digital al correo, verificando que el mensaje no ha sido alterado y que proviene del dominio declarado. Un `FAIL` indica posible manipulación o `spoofing`.
-    * **DMARC (Domain-based Message Authentication, Reporting & Conformance):** Política que indica qué hacer si SPF o DKIM fallan (ej. `reject`, `quarantine`, `none`). Un `FAIL` aquí es una fuerte indicación de correo ilegítimo.
-* **IP de Origen:** A menudo se encuentra en las cabeceras `Received:`. Analizar la reputación de esta IP es vital.
-
-### 2. Cuerpo del Correo (`Body`)
-
-El contenido visible del mensaje. Busca señales de alerta como:
-
-* **Sentido de Urgencia o Amenaza:** "Tu cuenta será bloqueada", "Factura pendiente urgente".
-* **Errores Gramaticales o de Ortografía:** Especialmente en correos que simulan ser de organizaciones grandes.
-* **Saludos Genéricos:** "Estimado cliente" en lugar de tu nombre.
-* **Peticiones Inusuales:** Solicitudes de credenciales, información personal, transferencias bancarias.
-* **Estilo Inconsistente:** Tono o formato que no coincide con comunicaciones previas de la entidad suplantada.
-* **Enlaces Sospechosos:** Ver siguiente sección.
-
-### 3. Enlaces y URLs
-
-Los enlaces son un componente crítico. No confíes en el texto mostrado del enlace; examina siempre la URL real a la que apunta (pasa el ratón por encima sin hacer clic, o examina el código fuente HTML del correo si es posible):
-
-* **Dominios Engañosos:** Uso de dominios similares al legítimo (ej. `paypaI.com` con 'i' mayúscula en lugar de `paypal.com`), subdominios extraños (`paypal.security-update.com`) o dominios completamente irrelevantes.
-* **Acortadores de URL:** Servicios como Bitly, TinyURL pueden ocultar destinos maliciosos. Necesitan ser expandidos y analizados con herramientas de reputación antes de visitarlos.
-* **Direcciones IP Directas:** Rara vez un servicio legítimo enlaza directamente a una IP en lugar de un nombre de dominio.
-* **"Defanging":** Al compartir o documentar URLs sospechosas, es una buena práctica "desactivarlas" para evitar clics accidentales, reemplazando `http` por `hxxp` y `.` por `[.]` (ej. `hxxp://malicious-site[.]com/login.php`).
-
-### 4. Archivos Adjuntos (`Attachments`)
-
-Los adjuntos son un vector común para entregar malware. Desconfía de:
-
-* **Tipos de Archivo Peligrosos:** `.exe`, `.scr`, `.bat`, `.ps1`, `.js`, `.vbs`. También archivos comprimidos (`.zip`, `.rar`, `.iso`, `.img`) que puedan contenerlos.
-* **Documentos con Macros:** Archivos de Office (`.docm`, `.xlsm`, `.pptm`) que solicitan habilitar macros pueden ejecutar código malicioso.
-* **Doble Extensión:** Archivos que intentan ocultar su tipo real (ej. `factura.pdf.exe`). Asegúrate de tener visibles las extensiones de archivo en tu sistema operativo.
-* **Archivos Protegidos por Contraseña:** A menudo usados para evadir el escaneo automático de los antivirus. La contraseña suele venir en el cuerpo del correo.
-* **Necesidad de Análisis:** NUNCA abras un adjunto sospechoso directamente. Usa sandboxes y herramientas de análisis de reputación (basadas en el hash del archivo).
-
-## 💡 Indicadores de Compromiso (IoCs) Clave
-
-Del análisis de estos artefactos, extraeremos IoCs valiosos para la defensa:
-
-* **Direcciones IP:** Del servidor de envío (`Received:` headers), de los dominios enlazados.
-* **Dominios y URLs:** Dominios de envío (`From:`, `Return-Path:`), dominios enlazados en el cuerpo, dominios de descarga de malware.
-* **Hashes de Archivos:** MD5, SHA1, SHA256 de los adjuntos maliciosos.
-* **Direcciones de Correo:** Del remitente (`From:`), `Reply-To`, `Return-Path`.
-* **Asuntos (Subjects):** Patrones en las líneas de asunto pueden usarse para crear reglas de detección.
+El análisis se divide en cuatro artefactos principales: cabeceras, cuerpo, URLs y adjuntos.
 
 ---
-*Estos son los elementos fundamentales que buscaremos. Las siguientes s
+
+## Cabeceras del correo
+
+Las cabeceras contienen la trazabilidad completa del mensaje. Se leen de abajo hacia arriba para seguir la ruta real.
+
+### Campos críticos
+
+**`Received:`** — Cada salto entre servidores añade una entrada. La más baja es el origen. Busca la IP del servidor de envío real, que puede no coincidir con el dominio del remitente.
+
+**`From:`** — Puede estar falsificado. No confíes en él solo.
+
+**`Reply-To:` y `Return-Path:`** — Si difieren del `From:`, es una señal. Los correos legítimos suelen tener consistencia entre estos tres campos.
+
+**`Authentication-Results:`** — Aquí están los resultados de SPF, DKIM y DMARC. Son lo más importante de las cabeceras para detectar spoofing.
+
+### SPF, DKIM y DMARC
+
+| Mecanismo | Qué verifica | Resultado sospechoso |
+|-----------|-------------|----------------------|
+| SPF | Si la IP de envío está autorizada por el dominio | `fail` o `softfail` |
+| DKIM | Firma digital del mensaje — que no fue alterado | `fail` |
+| DMARC | Política sobre qué hacer si SPF o DKIM fallan | `fail` + política `reject` ignorada |
+
+Un `DMARC fail` con política `reject` que llega igualmente a la bandeja de entrada indica que el servidor receptor no está aplicando la política — o que el correo pasó por una ruta alternativa.
+
+---
+
+## Cuerpo del mensaje
+
+Lo que el usuario ve. Busca:
+
+- Urgencia artificial: "tu cuenta será suspendida en 24h", "factura vencida"
+- Saludos genéricos en lugar del nombre real del destinatario
+- Errores ortográficos o de formato inconsistente con comunicaciones previas de la entidad suplantada
+- Peticiones fuera de lo normal: credenciales, transferencias, datos personales
+- Texto de enlace que no coincide con la URL real al pasar el cursor
+
+---
+
+## URLs y dominios
+
+Nunca hagas clic directamente. Examina la URL real:
+
+**Técnicas de engaño comunes:**
+- Typosquatting: `paypaI.com` (i mayúscula), `arnazon.com`
+- Subdominios falsos: `paypal.security-update-required.com` — el dominio real es `security-update-required.com`
+- Acortadores de URL que ocultan el destino real
+- IPs directas en lugar de nombres de dominio
+
+**Defanging** — cuando documentes una URL sospechosa, desactívala para evitar clics accidentales:
+
+```
+http://evil.com/login.php  →  hxxp://evil[.]com/login.php
+```
+
+---
+
+## Adjuntos
+
+**Nunca abrir directamente.** Calcula el hash primero y busca reputación antes de cualquier otra acción.
+
+Tipos de archivo que requieren atención inmediata:
+
+- Ejecutables y scripts: `.exe`, `.scr`, `.bat`, `.ps1`, `.vbs`, `.js`
+- Archivos comprimidos que pueden contenerlos: `.zip`, `.rar`, `.iso`, `.img`
+- Documentos Office con macros habilitadas: `.docm`, `.xlsm`
+- Doble extensión: `factura.pdf.exe` — Windows oculta la extensión real por defecto
+- Archivos protegidos por contraseña (la contraseña viene en el cuerpo para evadir el escaneo automático)
+
+---
+
+## IOCs que extraer
+
+Del análisis completo debes consolidar:
+
+- IPs del servidor de envío real (cabeceras `Received:`)
+- Dominios y URLs del cuerpo y cabeceras
+- Hashes MD5 y SHA256 de los adjuntos
+- Direcciones de correo del atacante (`From:`, `Reply-To:`, `Return-Path:`)
+- Asunto del correo (útil para crear reglas de detección por patrón)
