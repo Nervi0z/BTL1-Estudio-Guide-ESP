@@ -1,58 +1,93 @@
-# Estrategia General para el Examen BTL1
+# Estrategia para el examen BTL1
 
-El examen BTL1 es una maratón de 24 horas que pone a prueba no solo tus habilidades técnicas, sino también tu resistencia, organización y capacidad de gestión del tiempo. Tener una estrategia clara puede marcar una gran diferencia.
+## La mentalidad correcta
 
-##  প্রস্তুতি Antes de Empezar (Días Previos)
+BTL1 no pide que memorices comandos. Pide que investigues. La diferencia es importante: puedes tener todos los cheatsheets del mundo abiertos durante el examen, pero si no sabes qué pregunta estás intentando responder, los comandos no sirven de nada.
 
-* **Familiarízate con la Plataforma:** Si Security Blue Team ofrece información o demos sobre la interfaz del examen, revísala para no perder tiempo el día D.
-* **Confirma tus Herramientas:** Asegúrate de sentirte cómodo con las herramientas clave (Volatility, Splunk, Wireshark, etc.). No es momento de aprender a usar una herramienta desde cero.
-* **Prepara tu Entorno:** Ten listo tu espacio de trabajo, asegúrate de tener buena conexión a internet y minimiza posibles distracciones.
+Antes de ejecutar cualquier cosa, hazte estas preguntas:
+- ¿Qué estoy buscando?
+- ¿Qué herramienta tiene sentido usar aquí?
+- ¿Qué espero encontrar si mi hipótesis es correcta?
 
-## ⏱️ Las Primeras Horas: Lectura y Planificación
-
-* **Lee el Escenario (¡A Fondo!):** Lee el documento del escenario varias veces. Asegúrate de entender:
-    * El contexto general del incidente.
-    * Los objetivos específicos de la investigación (qué te piden encontrar).
-    * El formato y los requisitos del informe final.
-* **Reconocimiento Inicial:** Haz un primer vistazo rápido al entorno proporcionado (máquinas virtuales, archivos iniciales) para tener una idea general.
-* **Planifica (Borrador):** Esboza un plan inicial de ataque. ¿Por dónde empezarás? ¿Qué dominios parecen más relevantes según el escenario? Sé flexible, este plan puede cambiar.
-
-## ⏳ Gestión del Tiempo: El Reloj es Clave
-
-* **24 Horas No Son Infinitas:** Asigna bloques de tiempo aproximados para investigar diferentes áreas o responder a secciones del informe.
-* **Evita los "Rabbit Holes":** Es fácil perderse investigando un detalle sin importancia. Si llevas mucho tiempo en algo sin progreso claro, **ponle una marca, documéntalo y pasa a otra cosa**. Podrás volver más tarde si es necesario.
-* **Prioriza:** Enfócate en las tareas que responden directamente a los objetivos del escenario.
-* **Tiempo para el Informe:** ¡Reserva tiempo suficiente al final (o ve haciéndolo sobre la marcha) para redactar y revisar el informe!
-
-## 📝 Toma de Notas Eficaz: Tu Mejor Aliado
-
-* **Documenta TODO:** Es **CRUCIAL**. No confíes en tu memoria. Anota:
-    * Comandos exactos que ejecutas.
-    * Resultados importantes (IPs, hashes, nombres de archivo, timestamps, usuarios sospechosos).
-    * Rutas de archivos clave.
-    * Hipótesis que manejas.
-    * Pasos que sigues.
-    * Capturas de pantalla relevantes (¡revisa las reglas del examen sobre esto!).
-* **Elige una Herramienta y Sé Organizado:** Usa una aplicación de notas (CherryTree, Obsidian, Notion, KeepNote, OneNote, o incluso un editor de texto bien estructurado). Organiza tus notas por máquina, por tarea, por hallazgo, o como te resulte más lógico.
-* **Notas = Futuro Informe:** Piensa que unas buenas notas son la materia prima de tu informe final. Te ahorrarán muchísimo tiempo al redactar.
-
-## ✍️ Elaboración del Informe
-
-* **No lo Dejes para el Final:** Intenta ir rellenando secciones del informe a medida que confirmas hallazgos. Es más fácil escribir sobre algo que tienes fresco.
-* **Responde a Todo:** Asegúrate de abordar todas y cada una de las preguntas o requisitos planteados en el escenario.
-* **Claridad y Evidencia:** Sé claro en tus explicaciones y respalda cada conclusión con la evidencia que has recopilado (según las directrices del examen).
-
-## 🧘 Descansos y Bienestar
-
-* **Planifica Descansos Cortos:** Levántate, estira las piernas, descansa la vista cada cierto tiempo. Te ayudará a mantener la concentración.
-* **Hidrátate y Come:** Ten agua y comida saludable a mano. Evita comidas pesadas que te den sueño.
-* **Duerme si es Necesario:** Es una prueba larga. Si sientes que el agotamiento te bloquea, una siesta corta (si tu horario lo permite) puede ser más productivo que seguir luchando contra el cansancio extremo.
-
-## 💪 Mentalidad Durante el Examen
-
-* **Mantén la Calma:** Habrá momentos de frustración o bloqueo. Respira hondo y recuerda tu preparación.
-* **Sé Metódico:** Sigue tu plan (flexiblemente) y tu metodología de investigación.
-* **Confía en tus Habilidades:** Has estudiado y practicado. Aplica lo que sabes.
-* **No te Rindas:** Si algo no funciona, prueba otra cosa. La persistencia es clave.
+Esa secuencia — hipótesis, herramienta, validación — es lo que separa una investigación estructurada de ejecutar comandos al azar esperando que algo aparezca.
 
 ---
+
+## Gestión de las 24 horas
+
+24 horas parece mucho tiempo. No lo es si no tienes un plan.
+
+**Primera hora — orientación:**
+- Lee el escenario completo antes de tocar nada
+- Identifica qué dominios están involucrados (red, memoria, SIEM, etc.)
+- Anota las preguntas que tienes que responder
+- Decide por dónde empezar según lo que tengas disponible
+
+**Bloque principal — investigación:**
+- Trabaja por hipótesis, no por herramienta
+- Documenta mientras investigas, no al final. Si esperas al final para escribir, perderás detalle y tiempo
+- Cada hallazgo relevante: captura de pantalla, comando usado, interpretación
+
+**Última hora — informe:**
+- No empieces el informe en la última hora. Debería estar casi listo para entonces
+- Reserva ese tiempo para revisar que has respondido todas las preguntas del escenario
+- Comprueba que cada afirmación tiene su evidencia asociada
+
+---
+
+## Cómo investigar
+
+### Empieza por lo que tienes
+
+No siempre hay un punto de entrada obvio. Revisa qué artefactos tienes disponibles: logs, PCAPs, imagen de disco, volcado de memoria. Eso te dice por dónde empezar.
+
+### Conecta fuentes
+
+Un incidente real cruza múltiples fuentes de datos. Si encuentras una IP sospechosa en los logs del SIEM, búscala también en el tráfico de red. Si ves un proceso anómalo en memoria, comprueba si hay artefactos relacionados en disco. Las correlaciones son lo que construye el timeline del incidente.
+
+### Cuando te atascas
+
+Si llevas tiempo en un punto sin avanzar, para. Revisa lo que ya tienes, relee el escenario y plantéate si hay otra vía de investigación. A veces la respuesta está en una fuente diferente a la que estás mirando.
+
+### Falsos positivos
+
+No todo lo que parece sospechoso lo es. Antes de concluir que algo es malicioso, comprueba si tiene una explicación legítima. Un proceso con un nombre raro puede ser software corporativo. Una conexión a un puerto inusual puede ser una aplicación legítima mal configurada. El contexto importa.
+
+---
+
+## El informe
+
+El informe es parte de la puntuación, no un trámite. Estos son los errores más comunes:
+
+**No poner evidencia.** Cada hallazgo necesita respaldo: una captura de pantalla, un extracto de log, un hash. "Encontré actividad sospechosa" sin evidencia no puntúa.
+
+**No responder la pregunta directamente.** Lee cada pregunta del escenario y asegúrate de que tu respuesta la responde de forma explícita, no implícita.
+
+**Escribir solo al final.** Documenta mientras investigas. Es más fácil y el resultado es más detallado.
+
+**Ser impreciso con los IOCs.** Si identificas una IP maliciosa, un hash o un dominio, escríbelo exactamente. Los detalles técnicos tienen que ser precisos.
+
+---
+
+## Herramientas durante el examen
+
+El entorno del examen tiene las herramientas preinstaladas. No necesitas instalar nada. Lo que sí necesitas es saber usarlas con eficiencia:
+
+- **Splunk:** escribe las queries correctas desde el principio, no vayas por ensayo y error
+- **Wireshark:** usa filtros de display para reducir el ruido antes de analizar
+- **Volatility:** identifica el perfil correcto antes de lanzar plugins
+- **Autopsy / TSK:** sabe dónde buscar artefactos Windows relevantes sin recorrer todo el disco
+
+Cada módulo de esta guía incluye los comandos y filtros más habituales para cada herramienta. Úsalos como referencia rápida, no como sustituto de entender qué estás ejecutando.
+
+---
+
+## Práctica antes del examen
+
+No entres al examen sin haber practicado en laboratorios reales. Los recursos más útiles para BTL1:
+
+- [Blue Team Labs Online (BTLO)](https://blueteamlabs.online/) — laboratorios del mismo equipo que hace BTL1
+- [CyberDefenders](https://cyberdefenders.org/) — casos prácticos de forense y análisis de red
+- [TryHackMe](https://tryhackme.com/) — rutas de blue team con laboratorios guiados
+
+El objetivo no es completar el máximo número de laboratorios, sino trabajar con cada herramienta hasta que no tengas que pensar en la sintaxis — solo en lo que estás buscando.
