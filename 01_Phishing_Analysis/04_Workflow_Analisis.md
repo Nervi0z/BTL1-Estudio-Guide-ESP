@@ -1,62 +1,98 @@
-# Workflow Sugerido para Análisis de Phishing
+# Workflow — Análisis de un Correo Sospechoso
 
-Tener un proceso estructurado ayuda a analizar correos sospechosos de manera eficiente, segura y sin olvidar pasos importantes. Este es un workflow general que puedes adaptar según el caso y las herramientas disponibles.
+Proceso paso a paso para analizar un correo de phishing de forma estructurada. Adapta el nivel de profundidad según el contexto: un correo de spam genérico no requiere el mismo análisis que un spearphishing dirigido a un ejecutivo.
 
-**¡La Seguridad Primero!** Realiza siempre estos pasos en un entorno controlado (VM de análisis) y evita interactuar directamente con elementos potencialmente maliciosos en tu máquina principal. Si es posible, trabaja con el correo en formato de archivo (`.eml` o `.msg`).
-
-## Pasos del Workflow de Análisis
-
-1.  **Preparación y Seguridad:**
-    * Asegúrate de estar en tu entorno de análisis aislado.
-    * Ten a mano tus herramientas de análisis (navegador seguro, acceso a servicios online, terminal).
-    * Obtén el correo sospechoso como archivo (`.eml`/`.msg`) si es posible, para preservar los encabezados completos.
-
-2.  **Evaluación Inicial (Visual - Sin Clics):**
-    * **Remitente:** ¿Reconoces la dirección? ¿El nombre mostrado coincide con la dirección real?
-    * **Asunto:** ¿Es genérico, alarmista, inesperado? ¿Contiene errores?
-    * **Tono y Contenido:** Lee el cuerpo buscando urgencia, amenazas, mala gramática, saludos genéricos, peticiones extrañas.
-    * **Enlaces (Hover):** Pasa el cursor **sin hacer clic** sobre los enlaces. ¿La URL que se muestra en la barra de estado del navegador/cliente de correo coincide con el texto del enlace? ¿Parece sospechosa?
-
-3.  **Análisis de Encabezados (`Headers`):**
-    * Extrae los encabezados completos del correo.
-    * Pégalos en un analizador de encabezados (MxToolbox, Google Messageheader).
-    * **Verifica la Ruta:** Sigue las cabeceras `Received:` de abajo a arriba para identificar la IP de origen real.
-    * **Analiza la Reputación IP:** Comprueba la IP de origen en servicios como AbuseIPDB, VirusTotal, OTX.
-    * **Revisa Autenticación:** Presta especial atención a los resultados de `SPF`, `DKIM` y `DMARC`. Fallos aquí son fuertes indicadores de `spoofing`.
-    * **Compara `From:`, `Reply-To:`, `Return-Path:`:** ¿Son diferentes? ¿Apuntan a dominios sospechosos?
-
-4.  **Análisis Detallado del Cuerpo del Mensaje:**
-    * Busca técnicas de ingeniería social específicas (ej. pretexting, baiting).
-    * Identifica cualquier solicitud de información sensible (credenciales, datos personales, financieros).
-    * Extrae todas las URLs mencionadas para el siguiente paso.
-
-5.  **Análisis de URLs (Modo Seguro):**
-    * **Extrae y Unifica:** Lista todas las URLs únicas encontradas en el cuerpo y encabezados.
-    * **"Defang":** Conviértelas a formato `hxxp://dominio[.]com` para documentación segura.
-    * **Comprueba Reputación:** Busca cada URL/dominio en VirusTotal, URLhaus, OTX.
-    * **Expande Acortadores:** Usa un expansor de URLs si encuentras enlaces cortos (bit.ly, etc.) y analiza la URL final.
-    * **Previsualiza con Sandboxing:** Envía las URLs sospechosas a URLScan.io para ver una captura de pantalla y análisis de la página de destino sin visitarla directamente. Puedes usar Any.Run o Triage para una interacción más profunda si es necesario.
-
-6.  **Análisis de Adjuntos (Modo Seguro):**
-    * **¡NO ABRIR DIRECTAMENTE!**
-    * **Calcula Hashes:** Obtén los hashes MD5 y SHA256 del archivo (ver `03_Cheatsheet_Comandos.md`).
-    * **Comprueba Reputación del Hash:** Busca los hashes en VirusTotal y OTX. Esto suele ser suficiente para identificar malware conocido.
-    * **Identifica Tipo Real (Linux):** Usa el comando `file` para verificar si la extensión coincide con el tipo real de archivo.
-    * **Análisis en Sandbox (Si es Necesario):** Si el hash es desconocido o sospechoso, y las políticas lo permiten, sube el archivo a un sandbox (Any.Run, Hybrid Analysis, Triage) para análisis dinámico. **¡Considera la confidencialidad de los datos del archivo!**
-
-7.  **Extracción de IoCs y Conclusión:**
-    * **Consolida Hallazgos:** Reúne todos los Indicadores de Compromiso (IoCs) identificados:
-        * IPs maliciosas (origen, C&C)
-        * Dominios/URLs maliciosas
-        * Hashes de archivos maliciosos
-        * Direcciones de correo electrónico del atacante (`From`, `Reply-To`)
-        * Asuntos o patrones específicos.
-    * **Veredicto:** Determina si el correo es `Malicioso`, `Sospechoso`, o `Legítimo`.
-    * **Resumen:** Escribe un breve resumen explicando por qué llegaste a esa conclusión, mencionando las pruebas clave.
-
-8.  **Documentación / Escalado:**
-    * Documenta tus hallazgos de forma clara y estructurada (¡tus notas son clave aquí!).
-    * Sigue los procedimientos de tu organización para reportar el incidente, bloquear los IoCs, o escalar el análisis si es necesario.
+Trabaja siempre desde un entorno aislado. Si tienes el correo como archivo `.eml` o `.msg`, mejor — preserva las cabeceras completas y puedes analizarlo offline.
 
 ---
 
+## Paso 1 — Evaluación inicial (sin hacer clic en nada)
+
+Lee el correo sin interactuar con ningún elemento.
+
+**Remitente:**
+- ¿El nombre mostrado coincide con la dirección real? (`Display Name <real@domain.com>`)
+- ¿El dominio del remitente es el esperado o un lookalike?
+
+**Asunto:**
+- ¿Es genérico, alarmista o inesperado?
+- ¿Contiene errores o caracteres inusuales?
+
+**Cuerpo:**
+- ¿Hay urgencia artificial, amenazas o peticiones fuera de lo normal?
+- ¿Saludos genéricos en lugar de tu nombre?
+- ¿El estilo visual y de redacción coincide con comunicaciones anteriores de esa entidad?
+
+**Enlaces (hover, sin clic):**
+- Pasa el cursor sobre cada enlace y compara el texto mostrado con la URL real que aparece en la barra de estado.
+
+Con esta evaluación inicial ya puedes tener una hipótesis clara: legítimo, sospechoso o malicioso con alta probabilidad. El resto del análisis confirma o refuta.
+
+---
+
+## Paso 2 — Análisis de cabeceras
+
+Extrae el bloque completo de cabeceras y pégalo en MxToolbox o Google Messageheader.
+
+1. **Traza la ruta**: sigue las entradas `Received:` de abajo hacia arriba. Identifica la IP del servidor de origen real.
+
+2. **Analiza la IP de origen**: búscala en AbuseIPDB, VirusTotal y OTX. ¿Está reportada? ¿En qué categorías?
+
+3. **Revisa autenticación**: SPF, DKIM y DMARC. Cualquier `fail` es relevante. Un `pass` en todos no garantiza legitimidad (el atacante puede tener su propio dominio bien configurado), pero un `fail` es una señal clara.
+
+4. **Compara `From:`, `Reply-To:` y `Return-Path:`**: si difieren, documéntalo. Es una táctica común para que las respuestas vayan a una cuenta controlada por el atacante.
+
+---
+
+## Paso 3 — Extracción y análisis de URLs
+
+Lista todas las URLs únicas del cuerpo. Defángalas para documentarlas.
+
+Para cada URL:
+1. Busca el dominio en VirusTotal y URLhaus
+2. Consulta el historial WHOIS: ¿fue registrado recientemente?
+3. Envía la URL a URLScan.io para ver captura de pantalla y análisis sin riesgo
+4. Si es un acortador, expande primero la URL antes de analizarla
+
+Si una URL es desconocida pero sospechosa y necesitas ver el comportamiento completo, usa Any.Run o Triage.
+
+---
+
+## Paso 4 — Análisis de adjuntos
+
+**No abrir directamente bajo ningún concepto.**
+
+1. Calcula SHA256 (y MD5 si la plataforma lo requiere)
+2. Busca el hash en VirusTotal — revisa detección, nombre de la familia de malware y pestaña Behavior si hay análisis de sandbox
+3. Verifica el tipo real del archivo con `file` (Linux) o comprobando los magic bytes
+4. Si el hash es desconocido y tienes sospecha fundada: súbelo a un sandbox (Any.Run, Hybrid Analysis, Triage)
+
+Si el archivo tiene contraseña y la contraseña viene en el cuerpo del correo, es casi siempre un intento de evadir el escaneo automático. Documéntalo como indicador en sí mismo.
+
+---
+
+## Paso 5 — Consolidación de IOCs y veredicto
+
+Reúne todos los indicadores encontrados:
+
+| Tipo | Valor | Fuente | Reputación |
+|------|-------|--------|------------|
+| IP | `185.220.101.45` | Header `Received:` | AbuseIPDB 97/100 |
+| Dominio | `paypal-security[.]update.com` | Enlace en cuerpo | VT 12/94 |
+| Hash SHA256 | `d41d8cd9...` | Adjunto `factura.exe` | VT 45/72 |
+| Email | `noreply@paypal-security.update.com` | `From:` | — |
+
+**Veredicto:** Malicioso / Sospechoso / Legítimo
+
+Escribe un resumen de 2-3 frases explicando el razonamiento: qué artefactos confirman el veredicto y por qué.
+
+---
+
+## Paso 6 — Documentación
+
+Documenta mientras analizas, no al final. Para cada hallazgo:
+- Captura de pantalla o extracto relevante
+- Herramienta usada y resultado obtenido
+- Interpretación en una línea
+
+Si estás en el examen BTL1, el informe final es parte de la puntuación. Un análisis brillante sin evidencia documentada no puntúa igual que uno bien respaldado.
